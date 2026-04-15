@@ -5,6 +5,7 @@ import { readFileSync } from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { createClient } from '@supabase/supabase-js';
+import axios from 'axios';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const serverRoot = path.join(__dirname, '..');
@@ -310,6 +311,95 @@ app.put('/admin/knowledge/catalog', adminAuth, async (req, res) => {
     })),
   );
   res.json({ ok: true, count: arr.length });
+});
+
+// Quran API endpoints - proxy to alquran.cloud (like old Python code)
+const ALQURAN_BASE = 'https://api.alquran.cloud/v1';
+
+const EDITIONS = {
+  'ar': 'quran-uthmani',
+  'tr': 'tr.diyanet',
+  'en': 'en.asad',
+  'de': 'de.aburida',
+  'fr': 'fr.hamidullah',
+  'ru': 'ru.kuliev',
+  'id': 'id.indonesian',
+};
+
+// Get all surahs list
+app.get('/surah', async (_req, res) => {
+  try {
+    const response = await axios.get(`${ALQURAN_BASE}/surah`);
+    const data = response.data;
+    if (data.code !== 200) {
+      res.status(500).json({ error: 'Failed to load surahs' });
+      return;
+    }
+    res.json(data);
+  } catch (error) {
+    console.error('Error fetching surahs:', error.message);
+    res.status(500).json({ error: 'Failed to load surahs' });
+  }
+});
+
+// Get specific surah
+app.get('/surah/:id', async (req, res) => {
+  try {
+    const surahId = parseInt(req.params.id, 10);
+    const lang = req.query.lang || 'ar';
+    const edition = EDITIONS[lang] || 'quran-uthmani';
+    
+    const response = await axios.get(`${ALQURAN_BASE}/surah/${surahId}/${edition}`);
+    const data = response.data;
+    if (data.code !== 200) {
+      res.status(500).json({ error: 'Failed to load surah' });
+      return;
+    }
+    res.json(data);
+  } catch (error) {
+    console.error('Error fetching surah:', error.message);
+    res.status(500).json({ error: 'Failed to load surah' });
+  }
+});
+
+// Get surah translations
+app.get('/surah/:id/translations', async (req, res) => {
+  try {
+    const surahId = parseInt(req.params.id, 10);
+    const lang = req.query.lang || 'en';
+    const edition = EDITIONS[lang] || 'en.asad';
+    
+    const response = await axios.get(`${ALQURAN_BASE}/surah/${surahId}/${edition}`);
+    const data = response.data;
+    if (data.code !== 200) {
+      res.status(500).json({ error: 'Failed to load translation' });
+      return;
+    }
+    res.json(data);
+  } catch (error) {
+    console.error('Error fetching translation:', error.message);
+    res.status(500).json({ error: 'Failed to load translation' });
+  }
+});
+
+// Audio proxy
+app.get('/audio/:reciter/:surah/:ayah.mp3', async (req, res) => {
+  try {
+    const { reciter, surah, ayah } = req.params;
+    // Proxy to everyayah.com or similar
+    const audioUrl = `https://everyayah.com/data/${reciter}/${surah.toString().padStart(3, '0')}${ayah.toString().padStart(3, '0')}.mp3`;
+    
+    const response = await axios.get(audioUrl, { 
+      responseType: 'stream',
+      timeout: 10000 
+    });
+    
+    res.setHeader('Content-Type', 'audio/mpeg');
+    response.data.pipe(res);
+  } catch (error) {
+    console.error('Error fetching audio:', error.message);
+    res.status(404).json({ error: 'Audio not found' });
+  }
 });
 
 // Premium activation endpoint with Supabase token verification
