@@ -1,0 +1,26 @@
+[
+  {
+    "id": "quran_preservation",
+    "title": "Kur'an'ın korunması",
+    "content": "Kur'an, hem hıfz (ezber) hem de mushaf yazımı ile nesilden nesile aktarılmıştır. Erken dönemde vahyin toplanması ve yaygın okunuş (kıraat) geleneği, metnin bütünlüğünü desteklemiştir.",
+    "benefit": "Kur'an'a güveni ve okuma motivasyonunu pekiştirir."
+  },
+  {
+    "id": "first_revelation",
+    "title": "İlk indirilen sure",
+    "content": "Çoğu kaynağa göre ilk gelen ayetler Alak suresinin başındaki \"Oku!\" ile başlayan ayetlerdir. Müslümanlar için okuma, öğrenme ve ilim yolunun sembolüdür.",
+    "benefit": "İlim ve hayat boyu öğrenmeye verilen değeri hatırlatır."
+  },
+  {
+    "id": "kaaba_history",
+    "title": "Kâbe ve Hz. İbrahim",
+    "content": "Kâbe, İslam inancında Hz. İbrahim ve oğlu İsmail ile ilişkilendirilen kıble ve hac merkezidir. Tavaf, hac ve umre ibadetlerinin kalbidir.",
+    "benefit": "Kıble ve birlik duygusunu güçlendirir."
+  },
+  {
+    "id": "hijri_calendar",
+    "title": "Hicrî takvim",
+    "content": "Hicrî takvim ay yılına göredir; Ramazan ve hac aylarını belirlemede kullanılır. Resmî işlerde miladi takvimle birlikte anılır.",
+    "benefit": "Dini günleri takip ederken takvim farkını anlamanı sağlar."
+  }
+]

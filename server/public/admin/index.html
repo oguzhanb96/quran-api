@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Misbah — Knowledge admin</title>
+  <style>
+    :root {
+      font-family: system-ui, sans-serif;
+      --bg: #0f172a;
+      --card: #1e293b;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --accent: #34d399;
+      --danger: #f87171;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+    header {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid #334155;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      align-items: center;
+    }
+    h1 { font-size: 1.1rem; margin: 0; font-weight: 600; }
+    main { padding: 1rem 1.25rem 3rem; max-width: 960px; margin: 0 auto; }
+    label { font-size: 0.75rem; color: var(--muted); display: block; margin-bottom: 0.25rem; }
+    input, select, textarea, button {
+      font: inherit;
+      border-radius: 8px;
+      border: 1px solid #475569;
+      background: var(--card);
+      color: var(--text);
+      padding: 0.5rem 0.65rem;
+    }
+    input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); border-color: transparent; }
+    textarea { width: 100%; min-height: 140px; resize: vertical; }
+    button {
+      cursor: pointer;
+      background: #047857;
+      border-color: #059669;
+      font-weight: 600;
+    }
+    button.secondary { background: #334155; border-color: #475569; }
+    button.danger { background: #7f1d1d; border-color: #991b1b; }
+    .row { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: flex-end; margin-bottom: 1rem; }
+    .grow { flex: 1; min-width: 180px; }
+    .msg { padding: 0.65rem 0.85rem; border-radius: 8px; margin-bottom: 1rem; font-size: 0.875rem; }
+    .msg.ok { background: #064e3b; border: 1px solid #059669; }
+    .msg.err { background: #450a0a; border: 1px solid #b91c1c; }
+    .grid { display: grid; gap: 0.75rem; }
+    @media (min-width: 640px) { .grid-2 { grid-template-columns: 1fr 1fr; } }
+    table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+    th, td { text-align: left; padding: 0.45rem 0.5rem; border-bottom: 1px solid #334155; }
+    th { color: var(--muted); font-weight: 500; }
+    .truncate { max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Knowledge admin</h1>
+    <div class="grow">
+      <label for="baseUrl">API base URL</label>
+      <input id="baseUrl" type="url" placeholder="https://your-vps.example.com" style="width:100%;max-width:420px" />
+    </div>
+    <div>
+      <label for="token">Admin token</label>
+      <input id="token" type="password" autocomplete="current-password" placeholder="ADMIN_TOKEN" style="width:220px" />
+    </div>
+    <button type="button" class="secondary" id="saveLocal">Save locally</button>
+  </header>
+  <main>
+    <div id="message"></div>
+    <div class="row">
+      <div class="grow">
+        <label for="moduleSelect">Module</label>
+        <select id="moduleSelect"></select>
+      </div>
+      <div>
+        <label for="lang">Language</label>
+        <select id="lang"><option value="tr">tr</option></select>
+      </div>
+      <button type="button" id="reload">Load items</button>
+    </div>
+    <p style="color:var(--muted);font-size:0.8rem;margin:0 0 1rem;">
+      Edit JSON array below, then <strong>Save all items</strong>. Or manage single rows in the table.
+    </p>
+    <textarea id="jsonEditor" spellcheck="false"></textarea>
+    <div class="row" style="margin-top:0.75rem">
+      <button type="button" id="saveAll">Save all items (PUT)</button>
+      <button type="button" class="secondary" id="formatJson">Format JSON</button>
+    </div>
+    <h2 style="font-size:1rem;margin:2rem 0 0.75rem">Items</h2>
+    <div style="overflow-x:auto">
+      <table>
+        <thead><tr><th>id</th><th>title</th><th>actions</th></tr></thead>
+        <tbody id="itemRows"></tbody>
+      </table>
+    </div>
+  </main>
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const storage = {
+      get baseUrl() { return localStorage.getItem('admin_base_url') || ''; },
+      set baseUrl(v) { localStorage.setItem('admin_base_url', v); },
+      get token() { return localStorage.getItem('admin_token') || ''; },
+      set token(v) { localStorage.setItem('admin_token', v); },
+    };
+
+    function showMsg(text, ok) {
+      const el = $('message');
+      el.innerHTML = text ? `<div class="msg ${ok ? 'ok' : 'err'}">${escapeHtml(text)}</div>` : '';
+    }
+
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+
+    function apiBase() {
+      let u = $('baseUrl').value.trim().replace(/\/$/, '');
+      if (!u) throw new Error('Set API base URL');
+      return u;
+    }
+
+    function headers() {
+      const t = $('token').value.trim();
+      if (!t) throw new Error('Set admin token');
+      return { 'Content-Type': 'application/json', 'X-Admin-Token': t };
+    }
+
+    async function fetchModules() {
+      const b = apiBase();
+      const lang = $('lang').value;
+      const res = await fetch(`${b}/admin/knowledge/modules?lang=${encodeURIComponent(lang)}`, { headers: headers() });
+      if (!res.ok) throw new Error(await res.text() || res.statusText);
+      return res.json();
+    }
+
+    async function fetchItems(moduleId) {
+      const b = apiBase();
+      const lang = $('lang').value;
+      const res = await fetch(`${b}/admin/knowledge/${encodeURIComponent(moduleId)}?lang=${encodeURIComponent(lang)}`, { headers: headers() });
+      if (!res.ok) throw new Error(await res.text() || res.statusText);
+      return res.json();
+    }
+
+    async function putItems(moduleId, items) {
+      const b = apiBase();
+      const lang = $('lang').value;
+      const res = await fetch(`${b}/admin/knowledge/${encodeURIComponent(moduleId)}?lang=${encodeURIComponent(lang)}`, {
+        method: 'PUT',
+        headers: headers(),
+        body: JSON.stringify(items),
+      });
+      if (!res.ok) throw new Error(await res.text() || res.statusText);
+      return res.json();
+    }
+
+    async function deleteItem(moduleId, itemId) {
+      const b = apiBase();
+      const lang = $('lang').value;
+      const res = await fetch(
+        `${b}/admin/knowledge/${encodeURIComponent(moduleId)}/items/${encodeURIComponent(itemId)}?lang=${encodeURIComponent(lang)}`,
+        { method: 'DELETE', headers: headers() },
+      );
+      if (!res.ok) throw new Error(await res.text() || res.statusText);
+    }
+
+    function renderTable(items) {
+      const tb = $('itemRows');
+      tb.innerHTML = '';
+      const mid = $('moduleSelect').value;
+      for (const it of items) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td class="truncate" title="${escapeHtml(it.id)}">${escapeHtml(it.id)}</td><td class="truncate" title="${escapeHtml(it.title)}">${escapeHtml(it.title)}</td><td><button type="button" class="danger btn-del" data-id="${escapeHtml(it.id)}">Delete</button></td>`;
+        tb.appendChild(tr);
+      }
+      tb.querySelectorAll('.btn-del').forEach((btn) => {
+        btn.addEventListener('click', async () => {
+          if (!confirm('Delete ' + btn.dataset.id + '?')) return;
+          try {
+            await deleteItem(mid, btn.dataset.id);
+            showMsg('Deleted', true);
+            await loadModuleItems();
+          } catch (e) {
+            showMsg(e.message || String(e), false);
+          }
+        });
+      });
+    }
+
+    async function loadModuleItems() {
+      showMsg('');
+      const mid = $('moduleSelect').value;
+      if (!mid) return;
+      try {
+        const items = await fetchItems(mid);
+        $('jsonEditor').value = JSON.stringify(items, null, 2);
+        renderTable(items);
+      } catch (e) {
+        showMsg(e.message || String(e), false);
+      }
+    }
+
+    async function populateModules() {
+      showMsg('');
+      try {
+        const mods = await fetchModules();
+        const sel = $('moduleSelect');
+        sel.innerHTML = '';
+        for (const m of mods) {
+          const o = document.createElement('option');
+          o.value = m.id;
+          o.textContent = `${m.title} (${m.itemCount ?? '?'})`;
+          sel.appendChild(o);
+        }
+        await loadModuleItems();
+        showMsg('Modules loaded', true);
+      } catch (e) {
+        showMsg(e.message || String(e), false);
+      }
+    }
+
+    $('baseUrl').value = storage.baseUrl || `${location.origin}`;
+    $('token').value = storage.token;
+
+    $('saveLocal').addEventListener('click', () => {
+      storage.baseUrl = $('baseUrl').value.trim();
+      storage.token = $('token').value.trim();
+      showMsg('Saved in browser', true);
+    });
+
+    $('reload').addEventListener('click', () => loadModuleItems());
+    $('moduleSelect').addEventListener('change', () => loadModuleItems());
+
+    $('formatJson').addEventListener('click', () => {
+      try {
+        const v = JSON.parse($('jsonEditor').value);
+        $('jsonEditor').value = JSON.stringify(v, null, 2);
+        showMsg('Formatted', true);
+      } catch (e) {
+        showMsg('Invalid JSON: ' + e.message, false);
+      }
+    });
+
+    $('saveAll').addEventListener('click', async () => {
+      showMsg('');
+      let items;
+      try {
+        items = JSON.parse($('jsonEditor').value);
+        if (!Array.isArray(items)) throw new Error('Root must be an array');
+      } catch (e) {
+        showMsg('Invalid JSON: ' + e.message, false);
+        return;
+      }
+      try {
+        await putItems($('moduleSelect').value, items);
+        showMsg('Saved ' + items.length + ' items', true);
+        await loadModuleItems();
+      } catch (e) {
+        showMsg(e.message || String(e), false);
+      }
+    });
+
+    populateModules();
+  </script>
+</body>
+</html>
