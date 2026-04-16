@@ -1,0 +1,7 @@
+# Copy to key.properties (do not commit key.properties) and fill in your Play upload keystore.
+# Generate a keystore: keytool -genkey -v -keystore misbah-release.jks -keyalg RSA -keysize 2048 -validity 10000 -alias misbah
+#
+storePassword=yourStorePassword
+keyPassword=yourKeyPassword
+keyAlias=misbah
+storeFile=../misbah-release.jks

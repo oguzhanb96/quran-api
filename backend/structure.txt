@@ -1,0 +1,17 @@
+app/
+    __init__.py
+    database.py
+    models.py
+    schemas.py
+    auth.py
+    crud_user.py
+    crud_quran.py
+    crud_prayer.py
+    routers/
+        __init__.py
+        auth.py
+        quran.py
+        prayer.py
+main.py
+requirements.txt
+README.md

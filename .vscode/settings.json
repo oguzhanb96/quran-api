@@ -1,0 +1,5 @@
+{
+  "java.project.importOnFirstTimeStartup": "disabled",
+  "java.import.gradle.enabled": false,
+  "java.showBuildStatusOnStart.enabled": false
+}

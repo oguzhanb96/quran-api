@@ -1,0 +1,32 @@
+[
+  {
+    "id": "shahada",
+    "title": "1. Kelime-i Şehadet (Şehadet)",
+    "content": "\"Eşhedü en lâ ilâhe illallâh ve eşhedü enne Muhammeden abdühü ve rasûlüh.\"\n\nAnlamı: Allah'tan başka ilah olmadığına ve Hz. Muhammed'in O'nun kulu ve elçisi olduğuna şahitlik ederim.\n\nİslam'ın birinci şartı olan şehadet, bir kişinin İslam'a girişinin temelidir. Bu kelimeyi içtenlikle söyleyen ve inanan kişi Müslüman olur. Kelime-i şehadet iki bölümden oluşur: Birinci bölüm tevhid (Allah'ın birliği), ikinci bölüm nübüvvet (peygamberlik) ikrarıdır.\n\nÖnemi:\n• Ezan ve kamette okunur\n• Namaza başlarken niyet ile birlikte hatırlanır\n• Can çekişen kişiye telkin edilir\n• Ölüm döşeğindeki son sözün bu kelime olması tavsiye edilir\n\nHadis: \"Kim 'Lâ ilâhe illallah' derse ve buna inanırsa cennete girer.\" (Buhari, Müslim)",
+    "benefit": "Tevhid inancını güçlendirir, kalbi şirkten korur ve İslam'ın özünü özetler."
+  },
+  {
+    "id": "salah",
+    "title": "2. Namaz (Salat)",
+    "content": "Namaz, İslam'ın ikinci şartı ve en önemli ibadetidir. Günde beş vakit kılınması farzdır.\n\nBeş Vakit Namaz:\n• Sabah (Fecr/İmsak): Fecrin doğuşundan güneşin doğuşuna kadar — 2 rekât\n• Öğle (Zuhr): Güneşin tepe noktasından sonra — 4 rekât\n• İkindi (Asr): Öğle ile akşam arası — 4 rekât\n• Akşam (Mağrib): Güneşin batışından sonra — 3 rekât\n• Yatsı (İşa): Akşam kararmasından sonra — 4 rekât\n\nNamazın Şartları:\n• Vakit: Her namazın belirlenmiş vakti vardır\n• Taharet: Abdest ve gusül ile temizlik\n• Setr-i avret: Avret yerlerinin örtülmesi\n• Kıble: Kabe'ye yönelmek\n• Niyet: Kalben niyet etmek\n\nNamazın Farzları (Rükünleri):\n• Kıyam (ayakta durmak)\n• Kıraat (Fatiha ve sure okumak)\n• Rükû (eğilmek)\n• Secde (alnı yere koymak)\n• Ka'de-i ahire (son oturuş)\n\nHadis: \"Namaz dinin direğidir. Onu kılan dini ayakta tutmuş, terk eden dini yıkmıştır.\" (Beyhaki)",
+    "benefit": "Kalbi diri tutar, disiplin ve düzen kazandırır, Allah ile sürekli bağ kurmayı sağlar."
+  },
+  {
+    "id": "zakat",
+    "title": "3. Zekât",
+    "content": "Zekât, İslam'ın üçüncü şartı olup nisap miktarına ulaşan malın kırkta birinin (% 2,5) yoksullara verilmesidir.\n\nNisap Miktarı:\n• Altın: 80,18 gram (20 miskal)\n• Gümüş: 561,27 gram (200 dirhem)\n• Para: Gümüş nisabına eşdeğer\n\nZekât Verilecek Kişiler (8 sınıf - Tevbe 60):\n1. Fakirler (mülksüz yoksullar)\n2. Miskinler (geçimini sağlayamayanlar)\n3. Zekât memurları\n4. Müellefe-i kulûb (kalpleri İslam'a ısındırılacaklar)\n5. Köleler (özgürlüklerini satın almak için)\n6. Borçlular\n7. Allah yolunda çalışanlar (fi sebilillah)\n8. Yolda kalmışlar (ibnüssebil)\n\nZekâtın Hikmeti:\n• Servetin toplumda dolaşımını sağlar\n• Cimrilikten arındırır\n• Toplumsal dayanışmayı güçlendirir\n• Malı bereketlendirir\n\nHadis: \"Sadaka malı eksiltmez.\" (Müslim)",
+    "benefit": "Malı temizler, toplumsal adaleti sağlar, cömertlik ve paylaşım duygusunu geliştirir."
+  },
+  {
+    "id": "sawm",
+    "title": "4. Oruç (Savm)",
+    "content": "Oruç, İslam'ın dördüncü şartıdır. Ramazan ayının tamamında imsak vaktinden iftar vaktine kadar yemek, içmek ve cinsel ilişkiden uzak durmaktır.\n\nOrucun Şartları:\n• Müslüman olmak\n• Akıl sağlığı\n• Ergenlik çağına ulaşmış olmak\n• Mukim olmak (yolcu değil)\n• Sağlıklı olmak\n\nOrucu Bozan Şeyler:\n• Bilerek yemek-içmek\n• Cinsel ilişki\n• Kasıtlı kusma\n• Hicamet (kan aldırma — Hanefi'ye göre)\n\nOrucu Bozmayan Şeyler:\n• Unutarak yemek-içmek\n• Ağzına su kaçması\n• Rüyada cünüp olmak\n• İğne (Hanefi'ye göre)\n\nRamazan'ın Fazileti:\n• Kadir Gecesi bu ayda\n• Cennet kapıları açılır, cehennem kapıları kapanır\n• Şeytanlar bağlanır\n• Her iyiliğin karşılığı katlanır\n\nHadis: \"Ramazan'ı iman ederek ve sevabını Allah'tan bekleyerek oruç tutanın geçmiş günahları bağışlanır.\" (Buhari, Müslim)",
+    "benefit": "Nefsi terbiye eder, sabır ve şükrü öğretir, empati duygusunu güçlendirir."
+  },
+  {
+    "id": "hajj",
+    "title": "5. Hac",
+    "content": "Hac, İslam'ın beşinci şartıdır. Gücü yeten her Müslümanın ömründe bir kez Zilhicce ayında Mekke'ye giderek belirli ibadetleri yerine getirmesidir.\n\nHaccın Farzları:\n1. İhrama girmek (niyet ve telbiye)\n2. Arafat'ta vakfe (9 Zilhicce öğleden sonra)\n3. Ziyaret tavafı (Kabe'yi 7 kez dolaşmak)\n\nHaccın Vacipleri:\n• Müzdelife'de vakfe\n• Sa'y (Safa ile Merve arasında 7 kez yürümek)\n• Şeytan taşlamak (cemrelere taş atmak)\n• Kurban kesmek (hacda)\n• Traş olmak veya saçı kısaltmak\n• Veda tavafı\n\nHac Türleri:\n• İfrad Haccı: Sadece hac\n• Temettu Haccı: Önce umre, sonra hac\n• Kıran Haccı: Umre ve hac birlikte\n\nHaccın Hikmeti:\n• Dünya Müslümanlarının birliğini simgeler\n• Hz. İbrahim'in sünnetini yaşatır\n• Ölüm ve ahireti hatırlatır\n• Günahlardan arınma fırsatı\n\nHadis: \"Mebrur haccın karşılığı yalnızca cennettir.\" (Buhari, Müslim)",
+    "benefit": "Manevi arınma sağlar, dünya Müslümanlarıyla kardeşliği pekiştirir, ahiret bilincini canlı tutar."
+  }
+]

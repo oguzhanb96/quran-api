@@ -1,0 +1,26 @@
+erDiagram
+  users ||--o{ user_devices : has
+  users ||--|| prayer_calculation_profiles : owns
+  users ||--o{ locations : saves
+  users ||--o{ daily_prayer_times : receives
+  quran_surahs ||--o{ quran_ayahs : contains
+  quran_ayahs ||--o{ quran_translations : translated
+  quran_ayahs ||--o{ quran_audio_tracks : recited
+  quran_audio_reciters ||--o{ quran_audio_tracks : provides
+  users ||--o{ quran_bookmarks : creates
+  users ||--|| quran_last_reads : tracks
+  hadith_collections ||--o{ hadith_entries : contains
+  users ||--o{ daily_content_queue : receives
+  dua_categories ||--o{ duas : contains
+  duas ||--o{ dua_translations : translated
+  duas ||--o{ dua_audio : pronounced
+  users ||--o{ user_favorite_duas : favorites
+  users ||--o{ dhikr_sessions : logs
+  users ||--o{ dhikr_stats_daily : aggregates
+  achievements ||--o{ user_achievements : unlocks
+  islamic_events ||--o{ user_event_reminders : schedules
+  users ||--o{ user_event_reminders : configures
+  users ||--o{ ai_conversations : starts
+  ai_conversations ||--o{ ai_messages : contains
+  ai_messages ||--o{ ai_feedback : rated
+  users ||--o{ subscriptions : owns

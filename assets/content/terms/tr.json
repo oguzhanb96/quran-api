@@ -1,0 +1,38 @@
+[
+  {
+    "id": "sunnah",
+    "title": "Sünnet",
+    "content": "Dilimize genelde \"Hz. Peygamber'in sözü, fiili ve takrirî bildirimi\" anlamında kullanılır. Fıkıhta bazen \"müekked sünnet\", \"müstehap\" gibi hükümlerle ilişkilendirilir; ilmihal ve mezhep kaynaklarında ayrıntılar bulunur.",
+    "benefit": "Metinleri okurken temel kavramları karıştırmamayı kolaylaştırır."
+  },
+  {
+    "id": "fard",
+    "title": "Farz",
+    "content": "Kur'an, kesin sünnet veya icmâ ile sabit olan, yerine getirilmesi vacip olan hüküm. Terki günah, inkârı küfüre götürebilir (konuya göre değişir).",
+    "benefit": "İbadet ve ahlak konularında öncelik belirlemeye yardım eder."
+  },
+  {
+    "id": "wajib",
+    "title": "Vacip",
+    "content": "Delili güçlü ama farz kadar kat'i olmayan; terk edilmesi günah sayılan hüküm. Bazı kaynaklarda farz ile vacip ayrımı daha sıkı yapılır.",
+    "benefit": "Namaz rükünleri ve kurban gibi konularda okuduğun metinleri anlamlandırır."
+  },
+  {
+    "id": "mustahab",
+    "title": "Müstehap / mendup",
+    "content": "Yerine getirilmesi sevap, terk edilmesi günah olmayan; teşvik edilen davranış veya ibadet unsurları.",
+    "benefit": "İbadette faziletleri kazanmak için yol haritası sunar."
+  },
+  {
+    "id": "makruh",
+    "title": "Mekruh",
+    "content": "Terki ecir, işlenmesi ise günah veya ecir kaybı olarak tanımlanan fiiller (tahrîmen / tenzîhen ayrımı vardır).",
+    "benefit": "Günlük alışkanlıkları İslami ölçüyle dengelemeye yardım eder."
+  },
+  {
+    "id": "halal_haram",
+    "title": "Helâl ve harâm",
+    "content": "Helâl: Şeriatın izin verdiği. Harâm: Kesin delillerle yasaklanan; istisnalar ilim ehli çerçevesinde değerlendirilir.",
+    "benefit": "Yeme-içme ve mal ile ilgili temel çerçeveyi hatırlatır."
+  }
+]

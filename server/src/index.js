@@ -326,6 +326,22 @@ const EDITIONS = {
   'id': 'id.indonesian',
 };
 
+// Get available editions
+app.get('/editions', async (_req, res) => {
+  try {
+    const response = await axios.get(`${ALQURAN_BASE}/edition`);
+    const data = response.data;
+    if (data.code !== 200) {
+      res.status(500).json({ error: 'Failed to load editions' });
+      return;
+    }
+    res.json(data);
+  } catch (error) {
+    console.error('Error fetching editions:', error.message);
+    res.status(500).json({ error: 'Failed to load editions' });
+  }
+});
+
 // Get all surahs list
 app.get('/surah', async (_req, res) => {
   try {

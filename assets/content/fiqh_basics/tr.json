@@ -1,0 +1,20 @@
+[
+  {
+    "id": "tahara_overview",
+    "title": "Taharet (temizlik) özeti",
+    "content": "Namaz ve bazı ibadetler için beden, elbise ve yerin najasten (pislikten) arınmış olması gerekir. Abdest ve gusül, en sık kullanılan temizlik şekilleridir.\n\nAbdest: Yüz, kollar (dirseklere kadar), başın dörtte biri ve ayaklar (topuklarla birlikte) yıkanır / mesh edilir; belirli sıra ve niyetle yapılır.\n\nGusül: Cünüplük, hayız, nifas gibi hallerde farz veya vacip olabilir; tüm vücudun iyice yıkanması esastır.",
+    "benefit": "İbadetin dış görünümünü ve huşûunu destekleyen temel bilgileri toparlar."
+  },
+  {
+    "id": "wudu_nullifiers",
+    "title": "Abdesti bozan durumlar (Hanefi özeti)",
+    "content": "Hanefi mezhebine göre abdesti bozan başlıca şeyler:\n• Ağız ve burundan çok miktarda kan gelmesi\n• Dışkı veya idrarın çıkması, gaz çıkması\n• Uyku ile bilinç kaybı (oturarak uyku hariç, ayrıntılı hükümler vardır)\n• Aklı yerinde olmayan sarhoşluk\n\nMezhepler arasında ince farklar bulunur; şüphede ilim ehline danışmak iyidir.",
+    "benefit": "Günlük namaz düzeninde yanlış yorumları azaltır."
+  },
+  {
+    "id": "prayer_conditions",
+    "title": "Namazın şartları (özet)",
+    "content": "Namazın sahih olması için genel olarak şunlar hatırlanır:\n• Vakit girmiş olmalı\n• Taharet (abdest / gusül)\n• Avret yerlerinin örtülmesi\n• Kıbleye yönelmek\n• Niyet\n\nFarz rekâtlar, sure ve zikirler için temel okuma bilgisi; ayakta durma, rükû, secde gibi rükünler yerine getirilmelidir.",
+    "benefit": "Namazda eksik bırakılan unsurları fark etmeye yardımcı olur."
+  }
+]
