@@ -27,7 +27,16 @@ jobs:
         with:
           channel: stable
       - run: flutter pub get
-      - run: flutter build appbundle --release
+      - name: Build app bundle (placeholder dart-define for reproducible CI)
+        env:
+          SUPABASE_URL: https://placeholder.supabase.co
+          SUPABASE_ANON_KEY: placeholder-anon-key
+          VPS_BASE_URL: http://127.0.0.1:8787
+        run: |
+          flutter build appbundle --release \
+            --dart-define=SUPABASE_URL=$SUPABASE_URL \
+            --dart-define=SUPABASE_ANON_KEY=$SUPABASE_ANON_KEY \
+            --dart-define=VPS_BASE_URL=$VPS_BASE_URL
 
   build_ios:
     runs-on: macos-latest
@@ -38,4 +47,13 @@ jobs:
         with:
           channel: stable
       - run: flutter pub get
-      - run: flutter build ios --release --no-codesign
+      - name: Build iOS (no codesign)
+        env:
+          SUPABASE_URL: https://placeholder.supabase.co
+          SUPABASE_ANON_KEY: placeholder-anon-key
+          VPS_BASE_URL: http://127.0.0.1:8787
+        run: |
+          flutter build ios --release --no-codesign \
+            --dart-define=SUPABASE_URL=$SUPABASE_URL \
+            --dart-define=SUPABASE_ANON_KEY=$SUPABASE_ANON_KEY \
+            --dart-define=VPS_BASE_URL=$VPS_BASE_URL

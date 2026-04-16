@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -222,7 +221,7 @@ class SettingsPage extends StatelessWidget {
                 controller: controller,
                 decoration: const InputDecoration(
                   labelText: 'VPS API Base URL',
-                  hintText: 'https://api.example.com/api/v1',
+                  hintText: 'https://api.example.com',
                 ),
               ),
               const SizedBox(height: 12),
@@ -293,27 +292,13 @@ class SettingsPage extends StatelessWidget {
                           ),
                           Column(
                             children: [
-                              Container(
-                                width: 88,
-                                height: 88,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: const Color(0xFFD97706),
-                                    width: 3,
-                                  ),
-                                ),
-                                clipBehavior: Clip.hardEdge,
-                                child: CachedNetworkImage(
-                                  imageUrl:
-                                      'https://lh3.googleusercontent.com/aida-public/AB6AXuDLi0p3lNMQpeBq3h53HshvAA5iWrpD77Dl4WqPghN6hn2uXxSJx90KAE7eLrQHtI0QEw9Rv_0sMtcf_0X5F0oPHhYNVSu-z0axUXEQQgEuoSJXANGRy8IfbYFfY3nVDa_xwjNEO5xScx4bcsDT3y1OQS_ncrFFkNVE-244yBSGfbCTxM47N53SJhA0DHhTSLHm9kmCG1nl0Conn2MCnsi9QkVDWiqDZNQ3CwZaj411ZaKd3hKW4n26s6QS68tSMpoMdzsdfLEd9lE',
-                                  fit: BoxFit.cover,
-                                  errorWidget: (context, url, error) =>
-                                      const Icon(
-                                        Icons.person,
-                                        size: 48,
-                                        color: Colors.white54,
-                                      ),
+                              CircleAvatar(
+                                radius: 44,
+                                backgroundColor: Colors.white.withValues(alpha: 0.12),
+                                child: const Icon(
+                                  Icons.person_rounded,
+                                  size: 52,
+                                  color: Colors.white,
                                 ),
                               ),
                               const SizedBox(height: 16),

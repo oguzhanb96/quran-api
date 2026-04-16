@@ -7,6 +7,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:dio/dio.dart';
 
 import 'app/app.dart';
+import 'core/config/api_base_url.dart';
 import 'core/config/app_config.dart';
 import 'core/services/notification_service.dart';
 import 'core/services/push_service.dart';
@@ -41,7 +42,9 @@ Future<void> bootstrap() async {
 
   await NotificationService().init();
   await PushService().init();
-  final syncDio = Dio(BaseOptions(baseUrl: AppPreferences.getVpsBaseUrl()));
+  final syncDio = Dio(
+    BaseOptions(baseUrl: ApiBaseUrl.normalize(AppPreferences.getVpsBaseUrl())),
+  );
   await OfflineFirstSyncService(syncDio).runIfNeeded();
   await DuaBrotherhoodSyncService(syncDio).flushQueue();
 

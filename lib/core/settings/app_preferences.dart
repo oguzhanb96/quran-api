@@ -1,5 +1,6 @@
 import 'package:hive_flutter/hive_flutter.dart';
 
+import '../config/api_base_url.dart';
 import '../config/app_config.dart';
 
 class AppPreferences {
@@ -326,14 +327,20 @@ class AppPreferences {
   }
 
   static String getVpsBaseUrl() {
-    return _box.get(
-      vpsBaseUrlKey,
-      defaultValue: AppConfig.vpsBaseUrl,
-    );
+    final raw = _box.get(vpsBaseUrlKey);
+    if (raw is String && raw.trim().isNotEmpty) {
+      return ApiBaseUrl.normalize(raw.trim());
+    }
+    return ApiBaseUrl.normalize(AppConfig.vpsBaseUrl);
   }
 
   static Future<void> setVpsBaseUrl(String value) async {
-    await _box.put(vpsBaseUrlKey, value.trim());
+    final t = value.trim();
+    if (t.isEmpty) {
+      await _box.delete(vpsBaseUrlKey);
+      return;
+    }
+    await _box.put(vpsBaseUrlKey, ApiBaseUrl.normalize(t));
   }
 
   static String? getAuthToken() => _box.get(authTokenKey) as String?;

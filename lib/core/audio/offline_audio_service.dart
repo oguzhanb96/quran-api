@@ -12,6 +12,23 @@ class OfflineAudioService {
   final Dio _dio;
   static bool _migrationChecked = false;
 
+  /// Resolves relative paths (e.g. /audio/...) against [Dio.options.baseUrl] so downloads work with VPS proxy.
+  String _absoluteUrl(String url) {
+    final t = url.trim();
+    if (t.isEmpty) return t;
+    if (t.startsWith('http://') || t.startsWith('https://')) return t;
+    var base = _dio.options.baseUrl.trim();
+    if (base.isEmpty) return t;
+    if (!base.startsWith('http://') && !base.startsWith('https://')) {
+      base = 'https://$base';
+    }
+    if (base.endsWith('/')) {
+      base = base.substring(0, base.length - 1);
+    }
+    final path = t.startsWith('/') ? t : '/$t';
+    return '$base$path';
+  }
+
   static String _stableFileName(String remoteUrl) {
     final digest = md5.convert(utf8.encode(remoteUrl));
     return digest.toString();
@@ -85,8 +102,11 @@ class OfflineAudioService {
   /// Resolves a cached file: new stable path first, then legacy per-profile folders.
   Future<File?> getCachedFile(String remoteUrl, AudioProfile profile) async {
     await _migrateIfNeeded();
-    
-    final primary = await _newCacheFile(remoteUrl);
+
+    final resolved = _absoluteUrl(remoteUrl);
+    final key = resolved.isNotEmpty ? resolved : remoteUrl;
+
+    final primary = await _newCacheFile(key);
     if (await primary.exists()) {
       // Validate file before returning
       if (await _isValidAudioFile(primary)) {
@@ -98,23 +118,25 @@ class OfflineAudioService {
       } catch (_) {}
     }
     
-    // Check legacy locations (for backwards compatibility)
+    // Legacy paths used raw [remoteUrl] hash; try both old and resolved keys.
+    final legacyKeys = <String>{remoteUrl.trim(), key};
     for (final p in AudioProfile.values) {
-      final leg = await _legacyCacheFile(remoteUrl, p);
-      if (await leg.exists()) {
-        // Validate legacy file
-        if (!await _isValidAudioFile(leg)) {
+      for (final lk in legacyKeys) {
+        if (lk.isEmpty) continue;
+        final leg = await _legacyCacheFile(lk, p);
+        if (await leg.exists()) {
+          if (!await _isValidAudioFile(leg)) {
+            try {
+              await leg.delete();
+            } catch (_) {}
+            continue;
+          }
           try {
-            await leg.delete();
-          } catch (_) {}
-          continue;
-        }
-        // Migrate to new location for future access
-        try {
-          await leg.copy(primary.path);
-          return primary;
-        } catch (_) {
-          return leg;
+            await leg.copy(primary.path);
+            return primary;
+          } catch (_) {
+            return leg;
+          }
         }
       }
     }
@@ -145,7 +167,10 @@ class OfflineAudioService {
 
   Future<File?> ensureCached(String remoteUrl, AudioProfile profile, {int retryCount = 3}) async {
     await _migrateIfNeeded();
-    
+
+    final resolved = _absoluteUrl(remoteUrl);
+    final key = resolved.isNotEmpty ? resolved : remoteUrl.trim();
+
     final existing = await getCachedFile(remoteUrl, profile);
     if (existing != null) {
       // Validate existing file
@@ -158,16 +183,18 @@ class OfflineAudioService {
       } catch (_) {}
     }
     
-    final file = await _newCacheFile(remoteUrl);
+    if (key.isEmpty) return null;
+
+    final file = await _newCacheFile(key);
     final tempFile = File('${file.path}.tmp');
-    
+
     for (var attempt = 0; attempt < retryCount; attempt++) {
       try {
         await file.parent.create(recursive: true);
         
         // Download to temp file first
         await _dio.download(
-          remoteUrl, 
+          key,
           tempFile.path,
           options: Options(
             receiveTimeout: const Duration(seconds: 30),

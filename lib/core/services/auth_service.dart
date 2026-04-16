@@ -25,11 +25,22 @@ class AuthService {
 
   bool get isAuthenticated => client?.auth.currentUser != null;
 
+  SupabaseClient get _requireClient {
+    final c = client;
+    if (c == null) {
+      throw StateError(
+        'Supabase is not configured. Build with --dart-define=SUPABASE_URL=... '
+        'and --dart-define=SUPABASE_ANON_KEY=...',
+      );
+    }
+    return c;
+  }
+
   Future<AuthResponse> signInWithEmailPassword({
     required String email,
     required String password,
   }) async {
-    return await client!.auth.signInWithPassword(
+    return _requireClient.auth.signInWithPassword(
       email: email,
       password: password,
     );
@@ -40,7 +51,7 @@ class AuthService {
     required String password,
     Map<String, dynamic>? data,
   }) async {
-    return await client!.auth.signUp(
+    return _requireClient.auth.signUp(
       email: email,
       password: password,
       data: data,

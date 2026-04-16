@@ -6,7 +6,6 @@ import '../../../../core/settings/app_preferences.dart';
 
 import 'package:dio/dio.dart';
 import 'package:go_router/go_router.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../core/services/auth_service.dart';
 import '../../../../core/network/app_dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -41,30 +40,27 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
   static const bool _demoMode = true;
 
   Future<void> _purchase() async {
-    if (!AuthService().isAuthenticated) {
-      final didAuth = await context.push<bool>('/auth');
-      if (didAuth != true) return; 
-    }
-
     setState(() => _isPurchasing = true);
     try {
-      // Simulate app store payment hook
-      await Future.delayed(const Duration(milliseconds: 1000));
-      
+      await Future.delayed(const Duration(milliseconds: 300));
+
       if (_demoMode) {
-        // DEMO: Skip backend API call, activate premium directly
         await AppPreferences.setPremiumEnabled(true);
         if (!mounted) return;
-        setState(() {
-          _premium = true;
-        });
+        setState(() => _premium = true);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Row(
               children: [
                 Icon(Icons.workspace_premium_rounded, color: Colors.white, size: 18),
                 SizedBox(width: 10),
-                Text('DEMO: Premium aktif! Tüm özellikler açıldı.', style: TextStyle(fontFamily: 'Plus Jakarta Sans', fontWeight: FontWeight.w600)),
+                Text(
+                  'DEMO: Premium aktif! Tüm özellikler açıldı.',
+                  style: TextStyle(
+                    fontFamily: 'Plus Jakarta Sans',
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ],
             ),
             backgroundColor: const Color(0xFF7C3AED),
@@ -76,17 +72,27 @@ class _PremiumPageState extends ConsumerState<PremiumPage> {
         );
         return;
       }
+
+      if (!AuthService().isAuthenticated) {
+        final didAuth = await context.push<bool>('/auth');
+        if (didAuth != true) return;
+      }
+
+      await Future.delayed(const Duration(milliseconds: 700));
       
       final dio = ref.read(dioProvider);
-      
-      final session = Supabase.instance.client.auth.currentSession;
-      final token = session?.accessToken;
+      final authClient = AuthService().client;
+      final token = authClient?.auth.currentSession?.accessToken;
+      final userId = AuthService().currentUserId;
+      if (userId == null || userId.isEmpty) {
+        throw StateError('Oturum kullanıcı ID içermiyor.');
+      }
 
       await dio.post(
-        '/api/v1/auth/premium/activate', 
+        '/api/v1/auth/premium/activate',
         data: {
           'plan': _plans[_selectedPlan].id,
-          'userId': AuthService().currentUserId,
+          'userId': userId,
         },
         options: Options(
           headers: token != null ? {'Authorization': 'Bearer $token'} : null,

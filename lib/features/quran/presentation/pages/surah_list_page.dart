@@ -8,7 +8,6 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 import '../../../../core/audio/audio_profile.dart';
 import '../../../../core/audio/offline_audio_service.dart';
-import '../../../../core/config/app_config.dart';
 import '../../../../core/network/app_dio.dart';
 import '../../../../core/theme/app_transitions.dart';
 import '../../../../core/widgets/app_side_panel.dart';
@@ -82,7 +81,7 @@ class _SurahListPageState extends ConsumerState<SurahListPage> {
       const profile = AudioProfile.male;
 
       final response = await dio.get<Map<String, dynamic>>(
-        '${AppConfig.quranApiBase}/surah/${surah.number}/$reciter',
+        '/surah/${surah.number}/reciter/$reciter',
       );
       final ayahs = (response.data?['data']?['ayahs'] as List<dynamic>? ?? []);
       final downloadedUrls = <String>[];
@@ -720,8 +719,15 @@ class _LastReadHero extends StatelessWidget {
           return const SizedBox.shrink();
         }
 
-        final surahName = lastRead['surahName'] as String;
-        final ayah = lastRead['ayah'] as int;
+        final surahName = lastRead['surahName']?.toString() ?? '';
+        final ayahRaw = lastRead['ayah'];
+        final ayah = ayahRaw is int
+            ? ayahRaw
+            : int.tryParse(ayahRaw?.toString() ?? '') ?? 1;
+        final surahNum = lastRead['surah'];
+        final surahInt = surahNum is int
+            ? surahNum
+            : int.tryParse(surahNum?.toString() ?? '') ?? 1;
 
         return AppGlassCard(
               padding: const EdgeInsets.all(28),
@@ -765,7 +771,7 @@ class _LastReadHero extends StatelessWidget {
                       Text(
                         surahName.isNotEmpty
                             ? surahName
-                            : '${AppText.of(context, 'tabSurah')} ${lastRead['surah']}',
+                            : '${AppText.of(context, 'tabSurah')} $surahInt',
                         style: GoogleFonts.notoSerif(
                           fontSize: 32,
                           fontWeight: FontWeight.bold,
@@ -788,11 +794,11 @@ class _LastReadHero extends StatelessWidget {
                             AppTransitions.fadeSlide(
                               page: QuranReadingPage(
                                 surahMeta: SurahMeta(
-                                  number: lastRead['surah'] as int,
+                                  number: surahInt,
                                   name: '',
                                   englishName: surahName.isNotEmpty
                                       ? surahName
-                                      : 'Surah ${lastRead['surah']}',
+                                      : 'Surah $surahInt',
                                   numberOfAyahs: 0,
                                   revelationType: '',
                                 ),

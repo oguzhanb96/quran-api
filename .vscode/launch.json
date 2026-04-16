@@ -1,0 +1,26 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Hidaya (local API :8787)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "args": [
+        "--dart-define=VPS_BASE_URL=http://127.0.0.1:8787",
+        "--dart-define=SUPABASE_URL=https://placeholder.supabase.co",
+        "--dart-define=SUPABASE_ANON_KEY=placeholder"
+      ]
+    },
+    {
+      "name": "Hidaya (VPS default from AppConfig)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "args": [
+        "--dart-define=SUPABASE_URL=https://placeholder.supabase.co",
+        "--dart-define=SUPABASE_ANON_KEY=placeholder"
+      ]
+    }
+  ]
+}
