@@ -297,8 +297,8 @@ class _QuranReadingPageState extends ConsumerState<QuranReadingPage> {
 
         arabicAyahs = (surahData?['ayahs'] as List<dynamic>? ?? []);
         final editionListResponse = await dio.get<Map<String, dynamic>>('/editions');
-        final editions = (editionListResponse.data as List<dynamic>? ?? []);
-        print('Editions count: ${editions.length}');
+        final editionList = (editionListResponse.data as List<dynamic>? ?? []);
+        print('Editions count: ${editionList.length}');
         Map<String, dynamic>? selectedTranslation;
         for (final edition in editions.whereType<Map>()) {
           final editionMap = edition.cast<String, dynamic>();
