@@ -64,7 +64,6 @@ class OfflineAudioService {
       // Check old ApplicationSupport directory
       final supportDir = await getApplicationSupportDirectory();
       final oldCacheDir = Directory('${supportDir.path}/audio/cache');
-      final oldProfileDir = Directory('${supportDir.path}/audio');
 
       // Migrate from cache subdirectory
       if (await oldCacheDir.exists()) {
