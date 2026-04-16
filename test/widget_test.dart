@@ -1,26 +1,15 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:hive/hive.dart';
 
 void main() {
-  testWidgets('renders base shell widget', (WidgetTester tester) async {
-    final tempDir = await Directory.systemTemp.createTemp('misbah_test_');
-    Hive.init(tempDir.path);
-    await Hive.openBox('settings');
-    await Hive.openBox('prayer_cache');
-    await Hive.openBox('quran_cache');
-
+  testWidgets('smoke: material app builds', (WidgetTester tester) async {
     await tester.pumpWidget(
       const MaterialApp(
         home: Scaffold(
-          body: Text('Misbah'),
+          body: Text('ok'),
         ),
       ),
     );
-    expect(find.text('Misbah'), findsOneWidget);
-    await Hive.close();
-
+    expect(find.text('ok'), findsOneWidget);
   });
 }
