@@ -14,7 +14,6 @@ class LaunchGatePage extends ConsumerStatefulWidget {
 }
 
 class _LaunchGatePageState extends ConsumerState<LaunchGatePage> {
-  static const Duration _minSplash = Duration(milliseconds: 800);
   static const Duration _maxSplash = Duration(seconds: 3);
 
   @override

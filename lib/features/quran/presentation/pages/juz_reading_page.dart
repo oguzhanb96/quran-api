@@ -11,7 +11,6 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 import '../../../../core/audio/audio_profile.dart';
 import '../../../../core/audio/offline_audio_service.dart';
-import '../../../../core/config/app_config.dart';
 import '../../../../core/network/app_dio.dart';
 import '../../../../core/quran/tajweed_engine.dart';
 import '../../../../core/settings/app_preferences.dart';
@@ -224,14 +223,14 @@ class _JuzReadingPageState extends ConsumerState<JuzReadingPage> {
         bundles = _parseBundles(decoded);
       } else {
         final results = await Future.wait<dynamic>([
-                  dio.get<Map<String, dynamic>>(
-            '${AppConfig.quranApiBase}/juz/${widget.juzNumber}/quran-uthmani',
+          dio.get<Map<String, dynamic>>(
+            '/juz/${widget.juzNumber}/quran-uthmani',
           ),
           dio.get<Map<String, dynamic>>(
-            '${AppConfig.quranApiBase}/juz/${widget.juzNumber}/$translationEdition',
+            '/juz/${widget.juzNumber}/$translationEdition',
           ),
           dio.get<Map<String, dynamic>>(
-            '${AppConfig.quranApiBase}/juz/${widget.juzNumber}/$reciterEdition',
+            '/juz/${widget.juzNumber}/$reciterEdition',
           ),
         ]);
 

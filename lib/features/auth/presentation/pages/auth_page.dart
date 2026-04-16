@@ -21,6 +21,19 @@ class _AuthPageState extends State<AuthPage> {
     final pass = _passCtrl.text.trim();
     if (email.isEmpty || pass.isEmpty) return;
 
+    if (AuthService().client == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Supabase yapılandırılmadı. Uygulamayı SUPABASE_URL ve '
+            'SUPABASE_ANON_KEY ile derleyin.',
+          ),
+          backgroundColor: Colors.deepOrange,
+        ),
+      );
+      return;
+    }
+
     setState(() => _isLoading = true);
     try {
       if (_isLogin) {

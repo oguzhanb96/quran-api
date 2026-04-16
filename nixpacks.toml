@@ -1,8 +1,11 @@
-[phases.setup]
-nixPkgs = ["nodejs", "npm"]
+# Monorepo: API in /server. Prefer Coolify Base directory "server".
+# If the build runs from repo root, these commands apply.
 
 [phases.install]
-cmds = ["npm ci --ignore-scripts"]
+cmds = ["cd server && npm ci"]
+
+[phases.build]
+cmds = ["true"]
 
 [start]
-cmd = "node src/index.js"
+cmd = "cd server && node src/index.js"

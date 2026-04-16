@@ -1,12 +1,12 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../config/api_base_url.dart';
 import '../settings/app_preferences.dart';
 
 final dioProvider = Provider<Dio>((ref) {
   final dio = Dio(
     BaseOptions(
-      baseUrl: AppPreferences.getVpsBaseUrl(),
       connectTimeout: const Duration(seconds: 15),
       receiveTimeout: const Duration(seconds: 15),
       sendTimeout: const Duration(seconds: 15),
@@ -15,6 +15,7 @@ final dioProvider = Provider<Dio>((ref) {
   dio.interceptors.add(
     InterceptorsWrapper(
       onRequest: (options, handler) {
+        options.baseUrl = ApiBaseUrl.normalize(AppPreferences.getVpsBaseUrl());
         options.headers['x-app-platform'] = 'flutter';
         options.headers['x-app-version'] = '1.0.1';
         final token = AppPreferences.getAuthToken();

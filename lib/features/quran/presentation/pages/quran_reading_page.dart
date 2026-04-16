@@ -12,7 +12,6 @@ import 'package:hive_flutter/hive_flutter.dart';
 
 import '../../../../core/audio/audio_profile.dart';
 import '../../../../core/audio/offline_audio_service.dart';
-import '../../../../core/config/app_config.dart';
 import '../../../../core/localization/app_language.dart';
 import '../../../../core/network/app_dio.dart';
 import '../../../../core/quran/tajweed_engine.dart';
@@ -582,7 +581,7 @@ class _QuranReadingPageState extends ConsumerState<QuranReadingPage> {
     }
     try {
       final response = await dio.get<Map<String, dynamic>>(
-        '${AppConfig.quranApiBase}/surah/$surahId/$reciterEdition',
+        '/surah/$surahId/reciter/$reciterEdition',
       );
       final ayahs = (response.data?['data']?['ayahs'] as List<dynamic>? ?? []);
       final mapped = <int, String>{};

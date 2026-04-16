@@ -6,6 +6,8 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { createClient } from '@supabase/supabase-js';
 import axios from 'axios';
+import swaggerUi from 'swagger-ui-express';
+import { openApiSpec } from './openapi-spec.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const serverRoot = path.join(__dirname, '..');
@@ -136,11 +138,72 @@ function adminAuth(req, res, next) {
 }
 
 const app = express();
+app.set('trust proxy', 1);
 app.use(cors());
 app.use(express.json({ limit: '2mb' }));
 
+function healthPayload() {
+  return { ok: true, service: 'hidaya-api' };
+}
+
 app.get('/health', (_req, res) => {
-  res.json({ ok: true });
+  res.json(healthPayload());
+});
+
+app.get('/api/v1/health', (_req, res) => {
+  res.json(healthPayload());
+});
+
+function publicApiBaseUrl(req) {
+  const fromEnv = (process.env.PUBLIC_API_BASE || process.env.SWAGGER_SERVER_URL || '')
+    .trim()
+    .replace(/\/$/, '');
+  if (fromEnv) return fromEnv;
+  const rawProto = req.get('x-forwarded-proto') || req.protocol || 'http';
+  const proto = String(rawProto).split(',')[0].trim();
+  const rawHost = req.get('x-forwarded-host') || req.get('host') || '';
+  const host = String(rawHost).split(',')[0].trim();
+  if (!host) return '';
+  return `${proto}://${host}`;
+}
+
+function openApiSpecForRequest(req) {
+  const base = publicApiBaseUrl(req);
+  const servers = base
+    ? [{ url: base, description: 'This deployment' }]
+    : [{ url: '/', description: 'Same origin' }];
+  return { ...openApiSpec, servers };
+}
+
+function swaggerAttachRequestSpec(req, _res, next) {
+  req.swaggerDoc = openApiSpecForRequest(req);
+  next();
+}
+
+app.get('/openapi.json', (req, res) => {
+  res.json(openApiSpecForRequest(req));
+});
+
+const swaggerUiOptions = {
+  customSiteTitle: 'Quran API',
+  customCss: '.swagger-ui .topbar { display: none }',
+};
+const swaggerSetupMiddleware = swaggerUi.setup(openApiSpec, swaggerUiOptions);
+
+function mountSwaggerUi(mountPath) {
+  app.use(
+    mountPath,
+    swaggerAttachRequestSpec,
+    ...swaggerUi.serveFiles(openApiSpec, { swaggerOptions: {} }),
+    swaggerSetupMiddleware,
+  );
+}
+
+mountSwaggerUi('/docs');
+mountSwaggerUi('/api-docs');
+
+app.get('/swagger', (_req, res) => {
+  res.redirect(302, '/docs/');
 });
 
 app.get('/knowledge/modules', async (req, res) => {
@@ -339,6 +402,50 @@ app.get('/editions', async (_req, res) => {
   } catch (error) {
     console.error('Error fetching editions:', error.message);
     res.status(500).json({ error: 'Failed to load editions' });
+  }
+});
+
+// Surah + edition (e.g. reciter ar.alafasy) — all traffic via this API
+app.get('/surah/:surahId/reciter/:edition', async (req, res) => {
+  try {
+    const surahId = parseInt(req.params.surahId, 10);
+    const { edition } = req.params;
+    if (Number.isNaN(surahId) || !edition) {
+      res.status(400).json({ error: 'Invalid surah or edition' });
+      return;
+    }
+    const response = await axios.get(`${ALQURAN_BASE}/surah/${surahId}/${edition}`);
+    const data = response.data;
+    if (data.code !== 200) {
+      res.status(500).json({ error: 'Failed to load surah' });
+      return;
+    }
+    res.json(data);
+  } catch (error) {
+    console.error('Error fetching surah edition:', error.message);
+    res.status(500).json({ error: 'Failed to load surah' });
+  }
+});
+
+// Juz + edition — proxy (was direct alquran.cloud from app)
+app.get('/juz/:juzNum/:edition', async (req, res) => {
+  try {
+    const juzNum = parseInt(req.params.juzNum, 10);
+    const { edition } = req.params;
+    if (Number.isNaN(juzNum) || !edition) {
+      res.status(400).json({ error: 'Invalid juz or edition' });
+      return;
+    }
+    const response = await axios.get(`${ALQURAN_BASE}/juz/${juzNum}/${edition}`);
+    const data = response.data;
+    if (data.code !== 200) {
+      res.status(500).json({ error: 'Failed to load juz' });
+      return;
+    }
+    res.json(data);
+  } catch (error) {
+    console.error('Error fetching juz:', error.message);
+    res.status(500).json({ error: 'Failed to load juz' });
   }
 });
 

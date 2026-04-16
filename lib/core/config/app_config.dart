@@ -26,8 +26,10 @@ class AppConfig {
     defaultValue: '',
   );
 
-  static String get vpsBaseUrl =>
-      _d0.isNotEmpty ? _d0 : _fb('aHR0cDovL3J1ZGRkNDBuMmhzdDh5cjdyYTBycDMzOS4xOTIuMjI3LjIxOS4yMzAuc3NsaXAuaW8=');
+  static const String _vpsFallbackB64 =
+      'aHR0cHM6Ly9ydWRkZDQwbjJoc3Q4eXI3cmEwcnAzMzkuMTkyLjIyNy4yMTkuMjMwLnNzbGlwLmlv';
+
+  static String get vpsBaseUrl => _d0.isNotEmpty ? _d0 : _fb(_vpsFallbackB64);
 
   static String get quranApiBase =>
       _d1.isNotEmpty ? _d1 : _fb('aHR0cHM6Ly9hcGkuYWxxdXJhbi5jbG91ZC92MQ==');
