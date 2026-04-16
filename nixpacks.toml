@@ -1,0 +1,12 @@
+# Monorepo: API lives in /server. Coolify should use Base directory "server"
+# and then ignore this file, OR use install/start that run from server/.
+# If your platform builds from repo root only, these cmds fix paths.
+
+[phases.install]
+cmds = ["cd server && npm ci"]
+
+[phases.build]
+cmds = ["true"]
+
+[start]
+cmd = "cd server && node src/index.js"
