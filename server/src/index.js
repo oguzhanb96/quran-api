@@ -36,6 +36,7 @@ loadDotEnv();
 
 const PORT = Number(process.env.PORT || 8787);
 const ADMIN_TOKEN = (process.env.ADMIN_TOKEN || '').trim();
+const INVENTORY_READ_TOKEN = (process.env.INVENTORY_READ_TOKEN || '').trim();
 
 // Supabase configuration for token verification
 const SUPABASE_URL = process.env.SUPABASE_URL || '';
@@ -46,6 +47,9 @@ const supabase = (SUPABASE_URL && SUPABASE_ANON_KEY)
 const DATA_DIR = path.isAbsolute(process.env.DATA_DIR || '')
   ? process.env.DATA_DIR
   : path.join(serverRoot, process.env.DATA_DIR || 'data');
+const PUBLIC_DIR = path.isAbsolute(process.env.PUBLIC_DIR || '')
+  ? process.env.PUBLIC_DIR
+  : path.join(serverRoot, process.env.PUBLIC_DIR || 'public');
 
 const MODULE_ID_RE = /^[a-z][a-z0-9_]{0,63}$/;
 const ITEM_ID_RE = /^[a-z0-9_]{1,64}$/;
@@ -137,10 +141,96 @@ function adminAuth(req, res, next) {
   next();
 }
 
+function inventoryAuth(req, res, next) {
+  if (!INVENTORY_READ_TOKEN) {
+    res.status(503).json({ error: 'INVENTORY_READ_TOKEN is not configured' });
+    return;
+  }
+  const h = req.headers.authorization || '';
+  const bearer = h.startsWith('Bearer ') ? h.slice(7).trim() : '';
+  if (bearer !== INVENTORY_READ_TOKEN) {
+    res.status(401).json({ error: 'Unauthorized' });
+    return;
+  }
+  next();
+}
+
 const app = express();
 app.set('trust proxy', 1);
 app.use(cors());
 app.use(express.json({ limit: '2mb' }));
+
+function clampInt(n, min, max) {
+  const v = Number.isFinite(n) ? n : Number(n);
+  if (!Number.isFinite(v)) return min;
+  return Math.max(min, Math.min(max, Math.trunc(v)));
+}
+
+function safeRootAbs(p) {
+  const abs = path.resolve(String(p || ''));
+  return abs;
+}
+
+function isSubPath(parent, child) {
+  const rel = path.relative(parent, child);
+  return rel && !rel.startsWith('..') && !path.isAbsolute(rel);
+}
+
+async function listFiles(rootAbs, opts) {
+  const {
+    maxFiles = 5000,
+    maxDepth = 10,
+    includeDirs = false,
+    allowExt = null,
+    baseRel = '',
+  } = opts || {};
+  const out = [];
+  const root = safeRootAbs(rootAbs);
+  const allow = Array.isArray(allowExt) && allowExt.length
+    ? new Set(allowExt.map((x) => String(x).toLowerCase()))
+    : null;
+  const q = [{ abs: root, depth: 0, rel: baseRel }];
+  while (q.length && out.length < maxFiles) {
+    const cur = q.shift();
+    if (!cur) break;
+    if (cur.depth > maxDepth) continue;
+    let entries = [];
+    try {
+      entries = await fs.readdir(cur.abs, { withFileTypes: true });
+    } catch {
+      continue;
+    }
+    for (const ent of entries) {
+      if (out.length >= maxFiles) break;
+      const abs = path.join(cur.abs, ent.name);
+      if (!isSubPath(root, abs) && abs !== root) continue;
+      const rel = cur.rel ? `${cur.rel}/${ent.name}` : ent.name;
+      if (ent.isDirectory()) {
+        if (includeDirs) out.push({ path: rel, type: 'dir' });
+        q.push({ abs, depth: cur.depth + 1, rel });
+        continue;
+      }
+      if (!ent.isFile()) continue;
+      if (allow) {
+        const ext = path.extname(ent.name).toLowerCase();
+        if (!allow.has(ext)) continue;
+      }
+      let st = null;
+      try {
+        st = await fs.stat(abs);
+      } catch {
+        continue;
+      }
+      out.push({
+        path: rel,
+        type: 'file',
+        bytes: st.size,
+        mtimeMs: st.mtimeMs,
+      });
+    }
+  }
+  return out;
+}
 
 function healthPayload() {
   return { ok: true, service: 'hidaya-api' };
@@ -152,6 +242,58 @@ app.get('/health', (_req, res) => {
 
 app.get('/api/v1/health', (_req, res) => {
   res.json(healthPayload());
+});
+
+app.get('/sync/bootstrap', async (req, res) => {
+  const lang = String(req.query.lang || 'tr').slice(0, 8);
+  const catalog = await readCatalog(lang);
+  res.json({
+    ok: true,
+    generatedAt: new Date().toISOString(),
+    lang,
+    knowledge: {
+      modules: catalog,
+    },
+    dataDir: path.basename(DATA_DIR),
+    publicDir: path.basename(PUBLIC_DIR),
+  });
+});
+
+app.get('/api/v1/inventory', inventoryAuth, async (req, res) => {
+  const lang = String(req.query.lang || 'tr').slice(0, 8);
+  const maxFiles = clampInt(Number(req.query.maxFiles), 1, 20000);
+  const maxDepth = clampInt(Number(req.query.maxDepth), 0, 25);
+  const extsRaw = String(req.query.exts || '').trim();
+  const allowExt = extsRaw
+    ? extsRaw
+      .split(',')
+      .map((x) => x.trim())
+      .filter(Boolean)
+      .map((x) => (x.startsWith('.') ? x : `.${x}`))
+    : null;
+
+  const [catalog, publicFiles] = await Promise.all([
+    readCatalog(lang),
+    listFiles(PUBLIC_DIR, { maxFiles, maxDepth, allowExt }),
+  ]);
+
+  res.json({
+    ok: true,
+    generatedAt: new Date().toISOString(),
+    lang,
+    data: {
+      root: DATA_DIR,
+      catalog,
+    },
+    public: {
+      root: PUBLIC_DIR,
+      files: publicFiles,
+      filesCount: publicFiles.length,
+      maxFiles,
+      maxDepth,
+      allowExt: allowExt || null,
+    },
+  });
 });
 
 function publicApiBaseUrl(req) {
@@ -577,7 +719,7 @@ app.post('/api/v1/auth/premium/activate', express.json(), async (req, res) => {
   }
 });
 
-app.use(express.static(path.join(serverRoot, 'public')));
+app.use(express.static(PUBLIC_DIR));
 
 app.use((err, _req, res, _next) => {
   console.error(err);
@@ -586,7 +728,14 @@ app.use((err, _req, res, _next) => {
 
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`Knowledge API listening on http://0.0.0.0:${PORT}`);
-  console.log(`VPS External URL: http://YOUR_VPS_IP:${PORT}`);
+  const publicBase = (process.env.PUBLIC_API_BASE || '').trim();
+  if (publicBase) {
+    console.log(`PUBLIC_API_BASE (browser): ${publicBase.replace(/\/$/, '')}`);
+  } else {
+    console.log(
+      'Tip: set PUBLIC_API_BASE in Coolify to your public https://... URL (same as Domains).',
+    );
+  }
   if (!ADMIN_TOKEN) {
     console.warn('ADMIN_TOKEN unset: admin write routes return 503');
   }
