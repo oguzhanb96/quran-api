@@ -1,0 +1,21 @@
+[Unit]
+Description=Hidaya Node API (Express)
+After=network.target
+
+[Service]
+Type=simple
+User=hidaya
+Group=hidaya
+WorkingDirectory=/opt/hidaya-api/server
+Environment=NODE_ENV=production
+EnvironmentFile=-/opt/hidaya-api/server/.env
+ExecStart=/usr/bin/node src/index.js
+Restart=on-failure
+RestartSec=5
+
+# Hardening
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
